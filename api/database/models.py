@@ -2,46 +2,32 @@
 Information Schema
 """
 
-
 from mongoengine import *
 
-
-# not going to directly store checkpoints as rows (documents) anywhere,
-# going to put checkpoint into a brevet, and then store brevetS
-
+# "your JSON inputs have to have the EXACT SAME field names!"
 class Checkpoint(EmbeddedDocument):
     """
     A MongoEngine EmbeddedDocument containing:
-    distance: MongoEngine float field, required, (checkpoint distance in kilometers),
-    location: MongoEngine string field, optional, (checkpoint location name),
-    open_time: MongoEngine datetime field, required, (checkpoint opening time),
-    close_time: MongoEngine datetime field, required, (checkpoint closing time).
+    miles: MongoEngine float field, optional, (checkpoint distance in miles)
+    km: MongoEngine float field, required, (checkpoint distance in kilometers)
+    open: MongoEngine datetime field, required, (checkpoint opening time)
+    close: MongoEngine datetime field, required, (checkpoint closing time)
+    location: MongoEngine string field, optional, (checkpoint location name)
     """
+    miles = FloatField()
+    km = FloatField(required=True)
+    open = StringField(required=True)       # trying with strings
+    close = StringField(required=True)      # trying with strings
+    location = StringField()
 
-    # FIXME: check MongoEngine docs and slides
-    # distance = FloatField(required=True)
-    # location = StringField(required=False)
-    # open_time = EmbeddedDocumentDatetimeField(required=True)    # "dont have to do datetimes, but strongly recommended"
-    # close_time = EmbeddedDocumentDatetimeField(required=True)   # "dont have to do datetimes, but strongly recommended"
-    pass
-
-
+# "your JSON inputs have to have the EXACT SAME field names!"
 class Brevet(Document):
     """
     A MongoEngine document containing:
-		length: MongoEngine float field, required
 		start_time: MongoEngine datetime field, required
-		checkpoints: MongoEngine list field of Checkpoints, required
+		brevet_dist: MongoEngine float field, required
+		controls: MongoEngine list field of Checkpoints, required
     """
-
-    # FIXME: 
-    # the non-StringFields will probably be of the form EmbeddedDocument____Field(...)
-    # check MongoEngine docs and slides
-    
-    length = FloatField(required=True)
-    start_time = EmbeddedDocumentDatetimeField(required=True)
-
-    # use consistent key names
-    # "must be EXACTLY the same thing as what you're gonna pass in when you're inserting this"
-    checkpoints = EmbeddedDocumentListField(Checkpoint) # list of Checkpoints
-    pass
+    start_time = StringField(required=True) # trying with strings
+    brevet_dist = FloatField(required=True)
+    controls = EmbeddedDocumentListField(Checkpoint) # list of Controls
