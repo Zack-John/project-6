@@ -242,7 +242,8 @@
                               $('.control').each(function(index) {
                                  var control = $(this);
 
-                                 if (controls[index]?.km && controls[index]?.open && controls[index]?.close) {
+                                 // if (controls[index]?.km && controls[index]?.open && controls[index]?.close) {
+                                 if (controls[index]?.km || controls[index]?.km == 0) {
                                     control.find("input[name='miles']").val(controls[index].miles);
                                     control.find("input[name='km']").val(controls[index].km);
                                     control.find("input[name='open']").val(controls[index].open);
