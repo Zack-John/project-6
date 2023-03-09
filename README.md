@@ -1,72 +1,39 @@
 # UOCIS322 - Project 6 #
 Brevet time calculator with MongoDB, and a RESTful API!
 
-Read about MongoEngine and Flask-RESTful before you start: [http://docs.mongoengine.org/](http://docs.mongoengine.org/), [https://flask-restful.readthedocs.io/en/latest/](https://flask-restful.readthedocs.io/en/latest/).
+Read about MongoEngine and Flask-RESTful here: [http://docs.mongoengine.org/](http://docs.mongoengine.org/), [https://flask-restful.readthedocs.io/en/latest/](https://flask-restful.readthedocs.io/en/latest/).
 
 ## Before you begin
-You *HAVE TO* copy `.env-example` into `.env` and specify your container port numbers there!
-Note that the default values (5000 and 5000) will work!
-
-*DO NOT PLACE LOCAL PORTS IN YOUR COMPOSE FILE!*
+Add a `.env` file to the main directory and specify your container API_PORT and BREVETS_PORT numbers there!
+(Note that the default values, 5000 and 5000, will work!)
 
 ## Overview
 
-You will reuse your code from Project 5, which already has two services:
+This app is a RUSA ACP controle time calculator, built with Flask + AJAX, MongoDB and a RESTful API to communicate between the app and database!
+> That's *"controle"* with an *e*, because it's French, although "control" is also accepted. Controls are points where a rider must obtain proof of passage, and control[e] times are the minimum and maximum times by which the rider must arrive at the location.
 
-* Brevets
-	* The entire web service
-* MongoDB
+### ACP controle times algorithm
 
-For this project, you will re-organize `Brevets` into two separate services:
+The algorithm for calculating controle times is described here [https://rusa.org/pages/acp-brevet-control-times-calculator](https://rusa.org/pages/acp-brevet-control-times-calculator). Additional background information is given here [https://rusa.org/pages/rulesForRiders](https://rusa.org/pages/rulesForRiders).
 
-* Web (Front-end)
-	* Time calculator (basically everything you had in project 4)
-* API (Back-end)
-	* A RESTful service to expose/store structured data in MongoDB.
+I have essentially replaced the calculator here [https://rusa.org/octime_acp.html](https://rusa.org/octime_acp.html).
 
-## Tasks
+## How to Use
 
-* Implement a RESTful API in `api/`:
-	* Write a data schema using MongoEngine for Checkpoints and Brevets:
-		* `Checkpoint`:
-			* `distance`: float, required, (checkpoint distance in kilometers), 
-			* `location`: string, optional, (checkpoint location name), 
-			* `open_time`: datetime, required, (checkpoint opening time), 
-			* `close_time`: datetime, required, (checkpoint closing time).
-		* `Brevet`:
-			* `length`: float, required, (brevet distance in kilometers),
-			* `start_time`: datetime, required, (brevet start time),
-			* `checkpoints`: list of `Checkpoint`s, required, (checkpoints).
-	* Using the schema, build a RESTful API with the resource `/brevets/`:
-		* GET `http://API:PORT/api/brevets` should display all brevets stored in the database.
-		* GET `http://API:PORT/api/brevet/ID` should display brevet with id `ID`.
-		* POST `http://API:PORT/api/brevets` should insert brevet object in request into the database.
-		* DELETE `http://API:PORT/api/brevet/ID` should delete brevet with id `ID`.
-		* PUT `http://API:PORT/api/brevet/ID` should update brevet with id `ID` with object in request.
+### Building and Serving
 
-* Copy over `brevets/` from your completed project 5.
-	* Replace every database related code in `brevets/` with calls to the new API.
-		* Remember: AutoGrader will ensure there is NO CONNECTION between `brevets` and `db` services. `brevets` should only operate through `api` and still function the way it did in project 5.
-		* Hint: Submit should send a POST request to the API to insert, Display should send a GET request, and display the last entry.
-	* Remove `config.py` and adjust `flask_brevets.py` to use the `PORT` and `DEBUG` values specified in env variables (see `docker-compose.yml`).
+Build / serve the docker image / container by running `docker compose up --build -d` from the main directory (where `docker-compose.yml` is located).
 
-* Update README.md with API documentation added.
+### Using the App
 
-As always you'll turn in your `credentials.ini` through Canvas.
+Once the containers are running, you can access the app via a web browser by navigating to `localhost:5002` (by default).
 
-## Grading Rubric
+You can then set the brevet length and start date/time with the input boxes at the top of the page.
 
-* If your code works as expected: 100 points. This includes:
-    * API routes as outlined above function exactly the way expected,
-    * Web application works as expected in project 5,
-    * README is updated with the necessary details.
+Once the brevet length and start are specified, simply fill in the desired distances for each checkpoint in either miles or km. The webpage will automatically populate checkpoint open and close times.
 
-* If the front-end service does not work, 20 points will be docked.
-
-* For each of the 5 requests that do not work, 15 points will be docked.
-
-* If none of the above work, 5 points will be assigned assuming project builds and runs, and `README` is updated. Otherwise, 0 will be assigned.
+To store your brevet info in the database, click the `Submit` button. To retrive the info you've stored, click the `Display` button. 
 
 ## Authors
 
-Michal Young, Ram Durairajan. Updated by Ali Hassani.
+Michal Young, Ram Durairajan. Updated by Ali Hassani. Updated again by Zack Johnson :)

@@ -1,3 +1,3 @@
 # API
 
-Implement your API here.
+RESTFUL API implemented here.
