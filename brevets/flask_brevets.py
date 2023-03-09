@@ -5,23 +5,20 @@ Replacement for RUSA ACP brevet time calculator
 """
 
 import os
+import logging
 import flask
 from flask import request
 import arrow  # Replacement for datetime, based on moment.js
 import acp_times  # Brevet time calculations
-import logging
 
 import requests # the library we use to send requests to API (not to be confused with flask.request!)
 
 
-
-# FIXME: remove these once actual logic is implemented
-# just here for now to avoid errors
-def brevet_insert(*args, **kwargs):
-    pass
-
-def brevet_fetch(*args, **kwargs):
-    pass
+# Set up Flask app
+app = flask.Flask(__name__)
+app.debug = True if "DEBUG" not in os.environ else os.environ["DEBUG"]
+port_num = True if "PORT" not in os.environ else os.environ["PORT"]
+app.logger.setLevel(logging.DEBUG)
 
 
 ##################################################
@@ -30,43 +27,34 @@ def brevet_fetch(*args, **kwargs):
 
 API_ADDR = os.environ["API_ADDR"]
 API_PORT = os.environ["API_PORT"]
-API_URL = f"http://{API_ADDR}:{API_PORT}/api/"
+API_URL = f"http://{API_ADDR}:{API_PORT}/api"
 
-# def get_brevet():
-#     """
-#     Obtains the newest document in the "lists" collection in database
-#     by calling the RESTful API.
+def get_brevet():
+    """
+    Obtains the newest document in the "brevets" collection in database
+    by calling the RESTful API.
+    Returns start_time, brevet_dist, and controls (list of dictionaries) as a tuple.
+    """
 
-#     Returns title (string) and items (list of dictionaries) as a tuple.
-#     """
-#     # Get documents (rows) in our collection (table),
-#     # Sort by primary key in descending order and limit to 1 document (row)
-#     # This will translate into finding the newest inserted document.
+    brevets = requests.get(f"{API_URL}/brevets").json()
+    brevet = brevets[-1]
 
-#     lists = requests.get(f"{API_URL}/todolists").json()
-
-#     # lists should be a list of dictionaries.
-#     # we just need the last one:
-#     todolist = lists[-1]
-#     return todolist["title"], todolist["items"]
+    return brevet["start_time"], brevet["brevet_dist"], brevet["controls"]
 
 
-# def insert_brevet(title, items):
-#     """
-#     Inserts a new to-do list into the database by calling the API.
-    
-#     Inputs a title (string) and items (list of dictionaries)
-#     """
-#     _id = requests.post(f"{API_URL}/todolists", json={"title": title, "items": items}).json()
-#     return _id
+def insert_brevet(start_time, brevet_dist, controls):
+    """
+    Inserts a new to-do list into the database by calling the API.
+    Inputs a start_time, brevet_dist and controls (list of dictionaries)
+    """
+
+    _id = requests.post(f"{API_URL}/brevets", json={"start_time": start_time, "brevet_dist": brevet_dist, "controls": controls}).json()
+    return _id
 
 
 ##################################################
 ################## Flask routes ################## 
 ##################################################
-
-# set up Flask app
-app = flask.Flask(__name__)
 
 @app.route("/")
 @app.route("/index")
@@ -74,11 +62,6 @@ def index():
     app.logger.debug("Main page entry")
     return flask.render_template('calc.html')
 
-
-##################################################
-############# AJAX request handlers ##############
-##################################################
-# (These return JSON, rather than rendering pages)
 
 @app.route("/_calc_times")
 def _calc_times():
@@ -114,8 +97,7 @@ def insert():
     try:
         # Read the entire request body as a JSON
         # This will fail if the request body is NOT a JSON.
-        # if successful, input_json is automatically parsed into a python dictionary!
-        input_json = request.json
+        input_json = request.get_json()
         
         # Because input_json is a dictionary, we can do this:
         start_time = input_json["start_time"]   # Should be a string
@@ -135,7 +117,7 @@ def insert():
                         mongo_id='None')
 
         else:
-            brev_id = brevet_insert(start_time, brevet_dist, controls)
+            brev_id = insert_brevet(start_time, brevet_dist, controls)
             return flask.jsonify(result={},
                             message="Inserted!", 
                             status=1,
@@ -160,7 +142,7 @@ def fetch():
     JSON interface: gets JSON, responds with JSON
     """
     try:
-        start_time, brevet_dist, controls = brevet_fetch()
+        start_time, brevet_dist, controls = get_brevet()
         return flask.jsonify(
                 result={"start_time": start_time, "brevet_dist": brevet_dist, "controls": controls}, 
                 status=1,
@@ -182,11 +164,5 @@ def page_not_found(error):
 ################# Start Flask App ################ 
 ##################################################
 
-app.debug = os.environ["DEBUG"]
-
-if app.debug:
-    app.logger.setLevel(logging.DEBUG)
-
 if __name__ == "__main__":
-    # print("Opening for global access on port {}".format(CONFIG.PORT))
-    app.run(port=os.environ["PORT"], host="0.0.0.0")
+    app.run(port=port_num, host="0.0.0.0")
