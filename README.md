@@ -1,11 +1,6 @@
-# UOCIS322 - Project 6 #
-Brevet time calculator with MongoDB, and a RESTful API!
+# Brevet time calculator with MongoDB, and a RESTful API! #
 
 Read about MongoEngine and Flask-RESTful here: [http://docs.mongoengine.org/](http://docs.mongoengine.org/), [https://flask-restful.readthedocs.io/en/latest/](https://flask-restful.readthedocs.io/en/latest/).
-
-## Before you begin
-Add a `.env` file to the main directory and specify your container API_PORT and BREVETS_PORT numbers there!
-(Note that the default values, 5000 and 5000, will work!)
 
 ## Overview
 
@@ -16,9 +11,13 @@ This app is a RUSA ACP controle time calculator, built with Flask + AJAX, MongoD
 
 The algorithm for calculating controle times is described here [https://rusa.org/pages/acp-brevet-control-times-calculator](https://rusa.org/pages/acp-brevet-control-times-calculator). Additional background information is given here [https://rusa.org/pages/rulesForRiders](https://rusa.org/pages/rulesForRiders).
 
-I have essentially replaced the calculator here [https://rusa.org/octime_acp.html](https://rusa.org/octime_acp.html).
+I have essentially reproduced the calculator here [https://rusa.org/octime_acp.html](https://rusa.org/octime_acp.html).
 
 ## How to Use
+
+### Before you begin
+Add a `.env` file to the main directory and specify your container API_PORT and BREVETS_PORT numbers there!
+(Note that the default values, 5000 and 5000, will work!)
 
 ### Building and Serving
 
@@ -34,6 +33,6 @@ Once the brevet length and start are specified, simply fill in the desired dista
 
 To store your brevet info in the database, click the `Submit` button. To retrive the info you've stored, click the `Display` button. 
 
-<h2></h2>
+##
 
-Project originally completed as an assignment for CS 322 - Software Engineering.
+This app was created by Zack Johnson as the final assignment for CS 322: Software Engineering.
