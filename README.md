@@ -34,6 +34,6 @@ Once the brevet length and start are specified, simply fill in the desired dista
 
 To store your brevet info in the database, click the `Submit` button. To retrive the info you've stored, click the `Display` button. 
 
-## Authors
+<h2></h2>
 
-Michal Young, Ram Durairajan. Updated by Ali Hassani. Updated again by Zack Johnson :)
+Project originally completed as an assignment for CS 322 - Software Engineering.
